@@ -11,17 +11,26 @@
 
     <TextView
         android:id="@+id/expression_text_field"
-
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="40sp"
+        android:textColor="@color/white"
+        android:gravity="end"
+        android:padding="16dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         />
 
     <GridLayout
         android:id="@+id/main_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="H,1:1"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="50dp"
         android:columnCount="4"
         android:rowCount="4"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -29,6 +38,54 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/expression_text_field">
 
+        <TextView
+            android:id="@+id/ac_button"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:background="@drawable/first_line_buttons"
+            android:text="AC"
+            android:textColor="@color/black"
+            android:textSize="30sp" />
+        <TextView
+            android:id="@+id/plus_minus_button"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:background="@drawable/first_line_buttons"
+            android:text="±"
+            android:textColor="@color/black"
+            android:textSize="30sp" />
+        <TextView
+            android:id="@+id/percent_button"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:background="@drawable/first_line_buttons"
+            android:text="%"
+            android:textColor="@color/black"
+            android:textSize="30sp" />
+        <TextView
+            android:id="@+id/div_button"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:background="@drawable/orange_buttons"
+            android:text="÷"
+            android:textColor="@color/white"
+            android:textSize="30sp" />
         <TextView
             android:id="@+id/seben_button"
             android:gravity="center"
@@ -185,7 +242,7 @@
             android:textColor="@color/button_text_selector"
             android:textSize="30sp" />
         <TextView
-            android:id="@+id/zwie_button"
+            android:id="@+id/zero_button"
             android:gravity="center_vertical"
             android:paddingStart="30dp"
             android:layout_width="0dp"
