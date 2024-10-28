@@ -11,11 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 //TODO
-//работа с double
-//не работает кнопка АС втф
 //+-
-//первый ноль
-//добавить возможность применять действия к предыдущему результату, если не нажали АС или не начали вводить цифры
+
 class MainActivity : AppCompatActivity() {
     private lateinit var digitButtons: List<TextView>
     private lateinit var operationButtons: List<TextView>
@@ -26,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private var firstClick = true
     private var pressedEquals = false
     private var pressedOperation = false
+    private var isFloatEntered = false
     private lateinit var gestureDetector: GestureDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         val acButton = findViewById<TextView>(R.id.ac_button)
         val floatButton = findViewById<TextView>(R.id.float_button)
 
+
         val commonClickListener = View.OnClickListener { view ->
             if (firstClick) {
                 expressionTextField.text = ""
@@ -85,6 +84,8 @@ class MainActivity : AppCompatActivity() {
         digitButtons.forEach { it.setOnClickListener(commonClickListener) }
         operationButtons.forEach { it.setOnClickListener(commonClickListener) }
         equalButton.setOnClickListener(commonClickListener)
+        acButton.setOnClickListener(commonClickListener)
+        floatButton.setOnClickListener(commonClickListener)
 
         gestureDetector = GestureDetector(this, SwipeGestureListener())
 
@@ -95,7 +96,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onFloatButton() {
-        TODO("Not yet implemented")
+        if (!isFloatEntered && !pressedOperation) {
+            isFloatEntered = false
+            if (expressionTextField.text.isEmpty() || expressionTextField.text == "0") {
+                expressionTextField.text = "0."
+            } else {
+                expressionTextField.append(".")
+            }
+        }
     }
 
 
@@ -103,9 +111,17 @@ class MainActivity : AppCompatActivity() {
         if (pressedOperation) {
             expressionTextField.text = ""
             pressedOperation = false
+            isFloatEntered = false
         }
         val currentText = expressionTextField.text.toString()
-        expressionTextField.text = currentText + button.text
+
+        if (currentText == "0" && button.text == "0") return
+
+        expressionTextField.text = if (currentText == "0") {
+            button.text
+        } else {
+            currentText + button.text
+        }
         currentOperation?.apply {
             setBackgroundResource(R.drawable.orange_buttons)
             setTextColor(resources.getColor(R.color.white))
@@ -115,7 +131,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun addOperationListener(button: TextView) {
         pressedOperation = true
-        firstNumber = expressionTextField.text.toString().toDoubleOrNull() ?: 0.0
+        isFloatEntered = false
+        firstNumber = expressionTextField.text.toString().toDoubleOrNull() ?: firstNumber
+        expressionTextField.text = dropZeroFractPart(firstNumber)
+
         currentOperation?.apply {
             setBackgroundResource(R.drawable.orange_buttons)
             setTextColor(ContextCompat.getColor(context, R.color.button_text_selector))
@@ -123,8 +142,6 @@ class MainActivity : AppCompatActivity() {
             currentOperation = button
             button.setBackgroundResource(R.drawable.active_orange_button)
             button.setTextColor(resources.getColor(R.color.orange))
-
-
         }
 
 
@@ -133,6 +150,7 @@ class MainActivity : AppCompatActivity() {
     private fun onEqualsPressed() {
         val secondNumber = expressionTextField.text.toString().toDoubleOrNull() ?: 0.0
         var result = 0.0
+        isFloatEntered = false
         pressedEquals = true
 
         when (currentOperation?.text) {
@@ -145,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             "×" -> result = firstNumber * secondNumber
-            "=" -> result = firstNumber
+            "=" -> result = expressionTextField.text.toString().toDouble()
         }
 
         currentOperation?.apply {
@@ -155,21 +173,28 @@ class MainActivity : AppCompatActivity() {
 
         currentOperation = null
 
-        expressionTextField.text = if (result % 1.0 == 0.0) {
-            result.toInt().toString()
-        } else {
-            result.toString()
-        }
+        expressionTextField.text = dropZeroFractPart(result)
         firstNumber = result
     }
 
+    private fun dropZeroFractPart(number : Double) : String {
+        if (number % 1.0 == 0.0) {
+            return number.toInt().toString()
+        }
+        else {
+            return number.toString()
+        }
+    }
+
     private fun onACPressed() {
+        isFloatEntered = false
         expressionTextField.text = ""
+        firstNumber = 0.0
         currentOperation?.apply {
             setBackgroundResource(R.drawable.orange_buttons)
             setTextColor(resources.getColor(R.color.white))
-
         }
+        firstClick = true
     }
 
     inner class SwipeGestureListener : GestureDetector.SimpleOnGestureListener() {
@@ -192,7 +217,6 @@ class MainActivity : AppCompatActivity() {
                 Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
             ) {
                 if (diffX > 0) {
-                    // Взмах слева направо: удаляем последнюю цифру
                     val currentText = expressionTextField.text.toString()
                     if (currentText.isNotEmpty()) {
                         expressionTextField.text = currentText.dropLast(1)
